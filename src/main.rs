@@ -1,6 +1,6 @@
 trait Account {
     fn deposit(&mut self, amount: u32);
-    fn withdraw(&mut self, amount: u32);
+    fn withdraw(&mut self, amount: &u32) -> Result<&str, &str>;
     fn balance(&self) -> i32;
 }
 
@@ -16,14 +16,12 @@ impl Account for BankAccount {
     fn balance(&self) -> i32 {
         self.balance
     }
-    fn withdraw(&mut self, amount: u32) {
-        if self.balance < amount as i32 {
-            println!(
-                "trying to withdraw {}, but balance is {}",
-                amount, self.balance
-            )
+    fn withdraw(&mut self, amount: &u32) -> Result<&str, &str> {
+        if self.balance < *amount as i32 {
+            return Err("Cannot withdraw more than balance, check balance and try again.");
         }
-        self.balance -= amount as i32
+        self.balance -= *amount as i32;
+        Ok("Succesfully withdrawed the amount")
     }
 }
 
@@ -39,8 +37,12 @@ fn main() {
         holder_name: "Utku Enes GURSEL".to_string(),
     };
 
+    let withdraw_amount = 100;
     account_b.deposit(2000);
-    account_b.withdraw(100);
+    match account_b.withdraw(&withdraw_amount) {
+        Ok(msg) => println!("{}", msg),
+        Err(msg) => println!("{}", msg),
+    }
     println!(
         "Balance: {} Holder: {}  A.N.: {}",
         account_b.balance(),
@@ -48,7 +50,10 @@ fn main() {
         account_b.account_number
     );
     account_a.deposit(1512512);
-    account_a.withdraw(112512);
+    match account_a.withdraw(&withdraw_amount) {
+        Ok(msg) => println!("{}", msg),
+        Err(msg) => println!("{}", msg),
+    }
     println!(
         "Balance: {} Holder: {}  A.N.: {}",
         account_a.balance(),
